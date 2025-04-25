@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SucursalDTO {
-    private String codigoSucursal;
-    private String nombreSucursal;
+public class ProductoDTO {
+    private String codigoProducto;
+    private String nombreProducto;
 }
