@@ -1,17 +1,10 @@
 package com.josedev.axity_consolidation_back.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,6 +31,7 @@ public class ConciliacionEntity {
             @JoinColumn(name = "codigo_producto", referencedColumnName = "codigo_producto"),
             @JoinColumn(name = "codigo_documento", referencedColumnName = "codigo_documento")
     })
+    @ToString.Exclude
     private SucursalProductoEntity sucursalProducto;
 
     @Column(name = "diferencia_fisica", nullable = false, precision = 12, scale = 2)

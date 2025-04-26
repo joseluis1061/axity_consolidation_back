@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -26,5 +27,6 @@ public class SucursalEntity {
     private String nombreSucursal;
 
     @OneToMany(mappedBy = "sucursal")
+    @ToString.Exclude
     private List<SucursalProductoEntity> sucursalProductos;
 }
