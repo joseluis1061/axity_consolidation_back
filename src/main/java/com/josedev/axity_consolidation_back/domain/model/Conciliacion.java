@@ -16,13 +16,11 @@ import java.time.LocalDateTime;
 public class Conciliacion {
     private Long idConciliacion;
     private LocalDate fechaConciliacion;
-    private SucursalProducto sucursalProducto;
     private BigDecimal diferenciaFisica;
     private BigDecimal diferenciaValor;
-    private EstadoConciliacion estadoConciliacion;
     private LocalDateTime fechaCreacion;
 
-    // Estos campos son útiles para la representación y facilitar el acceso a datos
+    // Datos de relaciones (para simplificar el mapeo y reducir la navegación anidada)
     private String codigoSucursal;
     private String nombreSucursal;
     private String codigoProducto;
@@ -30,4 +28,10 @@ public class Conciliacion {
     private String codigoDocumento;
     private String codigoEstado;
     private String descripcionEstado;
+
+    // Referencias a entidades relacionadas (opcionales, pueden ser útiles en algunos casos)
+    private Sucursal sucursal;
+    private Producto producto;
+    private Documento documento;
+    private EstadoConciliacion estadoConciliacion;
 }
