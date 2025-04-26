@@ -14,12 +14,14 @@ public interface SucursalMapper {
 
     SucursalMapper INSTANCE = Mappers.getMapper(SucursalMapper.class);
 
-    @Mapping(target = "sucursalProductos", ignore = true)
+    @Mapping(target = "sucursalProductos", source = "sucursalProductos")
     Sucursal entityToModel(SucursalEntity entity);
 
-    @Mapping(target = "sucursalProductos", ignore = true)
+    @Mapping(target = "sucursalProductos", source = "sucursalProductos")
     SucursalEntity modelToEntity(Sucursal model);
 
+    @Mapping(target = "codigoSucursal", source = "codigoSucursal")
+    @Mapping(target = "nombreSucursal", source = "nombreSucursal")
     SucursalDTO modelToDto(Sucursal model);
 
     Sucursal dtoToModel(SucursalDTO dto);

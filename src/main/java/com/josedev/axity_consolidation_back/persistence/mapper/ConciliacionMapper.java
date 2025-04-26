@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = {
         SucursalProductoMapper.class,
@@ -23,26 +22,33 @@ import java.util.stream.Collectors;
 })
 public interface ConciliacionMapper {
 
-    // Eliminamos la instancia estática ya que usamos inyección de dependencias
-    // ConciliacionMapper INSTANCE = Mappers.getMapper(ConciliacionMapper.class);
-
-    // Simplificamos las anotaciones, dejando la lógica compleja para el afterMapping
-    @Mapping(target = "codigoSucursal", ignore = true)
-    @Mapping(target = "nombreSucursal", ignore = true)
-    @Mapping(target = "codigoProducto", ignore = true)
-    @Mapping(target = "nombreProducto", ignore = true)
-    @Mapping(target = "codigoDocumento", ignore = true)
-    @Mapping(target = "codigoEstado", ignore = true)
-    @Mapping(target = "descripcionEstado", ignore = true)
-    @Mapping(target = "sucursal", ignore = true)
-    @Mapping(target = "producto", ignore = true)
-    @Mapping(target = "documento", ignore = true)
+    @Mapping(target = "codigoSucursal", source = "sucursalProducto.sucursal.codigoSucursal")
+    @Mapping(target = "nombreSucursal", source = "sucursalProducto.sucursal.nombreSucursal")
+    @Mapping(target = "codigoProducto", source = "sucursalProducto.producto.codigoProducto")
+    @Mapping(target = "nombreProducto", source = "sucursalProducto.producto.nombreProducto")
+    @Mapping(target = "codigoDocumento", source = "sucursalProducto.documento.codigoDocumento")
+    @Mapping(target = "codigoEstado", source = "estadoConciliacion.codigoEstado")
+    @Mapping(target = "descripcionEstado", source = "estadoConciliacion.descripcion")
+    @Mapping(target = "sucursal", source = "sucursalProducto.sucursal")
+    @Mapping(target = "producto", source = "sucursalProducto.producto")
+    @Mapping(target = "documento", source = "sucursalProducto.documento")
     Conciliacion entityToModel(ConciliacionEntity entity);
 
-    @Mapping(target = "sucursalProducto", ignore = true)
-    @Mapping(target = "estadoConciliacion", ignore = true)
+    @Mapping(target = "sucursalProducto", source = "sucursalProducto")
+    @Mapping(target = "estadoConciliacion", source = "estadoConciliacion")
     ConciliacionEntity modelToEntity(Conciliacion model);
 
+    @Mapping(target = "idConciliacion", source = "idConciliacion")
+    @Mapping(target = "fechaConciliacion", source = "fechaConciliacion")
+    @Mapping(target = "codigoSucursal", source = "codigoSucursal")
+    @Mapping(target = "nombreSucursal", source = "nombreSucursal")
+    @Mapping(target = "codigoProducto", source = "codigoProducto")
+    @Mapping(target = "nombreProducto", source = "nombreProducto")
+    @Mapping(target = "codigoDocumento", source = "codigoDocumento")
+    @Mapping(target = "diferenciaFisica", source = "diferenciaFisica")
+    @Mapping(target = "diferenciaValor", source = "diferenciaValor")
+    @Mapping(target = "codigoEstado", source = "codigoEstado")
+    @Mapping(target = "descripcionEstado", source = "descripcionEstado")
     ConciliacionDTO modelToDto(Conciliacion model);
 
     Conciliacion dtoToModel(ConciliacionDTO dto);
@@ -53,38 +59,23 @@ public interface ConciliacionMapper {
 
     ConciliacionFiltro dtoToFiltroModel(ConciliacionFiltroDTO dto);
 
+    @Mapping(target = "year", source = "year")
+    @Mapping(target = "month", source = "month")
+    @Mapping(target = "totalProcesados", source = "totalProcesados")
+    @Mapping(target = "totalDescuadrados", source = "totalDescuadrados")
+    @Mapping(target = "fechaProceso", source = "fechaProceso")
+    @Mapping(target = "conciliacionesDescuadradas", source = "conciliacionesDescuadradas", qualifiedByName = "conciliacionesToDTOs")
     ProcesoBatchResponseDTO resultToResponseDto(ProcesoBatchResult result);
+
+    @Named("conciliacionesToDTOs")
+    default List<ConciliacionDTO> mapConciliacionesToDTOs(List<Conciliacion> conciliaciones) {
+        return modelListToDtoList(conciliaciones);
+    }
 
     @AfterMapping
     default void afterMapping(@MappingTarget Conciliacion conciliacion, ConciliacionEntity entity) {
-        // Manejo seguro de nulos para SucursalProducto
-        if (entity.getSucursalProducto() != null) {
-            // Sucursal
-            if (entity.getSucursalProducto().getSucursal() != null) {
-                conciliacion.setCodigoSucursal(entity.getSucursalProducto().getSucursal().getCodigoSucursal());
-                conciliacion.setNombreSucursal(entity.getSucursalProducto().getSucursal().getNombreSucursal());
-                conciliacion.setSucursal(SucursalMapper.INSTANCE.entityToModel(entity.getSucursalProducto().getSucursal()));
-            }
-
-            // Producto
-            if (entity.getSucursalProducto().getProducto() != null) {
-                conciliacion.setCodigoProducto(entity.getSucursalProducto().getProducto().getCodigoProducto());
-                conciliacion.setNombreProducto(entity.getSucursalProducto().getProducto().getNombreProducto());
-                conciliacion.setProducto(ProductoMapper.INSTANCE.entityToModel(entity.getSucursalProducto().getProducto()));
-            }
-
-            // Documento
-            if (entity.getSucursalProducto().getDocumento() != null) {
-                conciliacion.setCodigoDocumento(entity.getSucursalProducto().getDocumento().getCodigoDocumento());
-                conciliacion.setDocumento(DocumentoMapper.INSTANCE.entityToModel(entity.getSucursalProducto().getDocumento()));
-            }
-        }
-
-        // Estado de conciliación
-        if (entity.getEstadoConciliacion() != null) {
-            conciliacion.setCodigoEstado(entity.getEstadoConciliacion().getCodigoEstado());
-            conciliacion.setDescripcionEstado(entity.getEstadoConciliacion().getDescripcion());
-        }
+        // Este método se mantiene, pero ya no es necesario configurar propiedades manualmente
+        // porque los mapeos ya están correctamente definidos en las anotaciones @Mapping
     }
 
     // Método para mapear un Page de entidades a un Page de DTOs
@@ -98,11 +89,5 @@ public interface ConciliacionMapper {
     default Page<Conciliacion> entityPageToModelPage(Page<ConciliacionEntity> entityPage) {
         List<Conciliacion> models = entityListToModelList(entityPage.getContent());
         return new PageImpl<>(models, entityPage.getPageable(), entityPage.getTotalElements());
-    }
-
-    // Método para configurar la entidad a partir del modelo al guardar
-    @AfterMapping
-    default void afterModelToEntityMapping(@MappingTarget ConciliacionEntity entity, Conciliacion model) {
-        // Aquí puedes implementar lógica adicional si es necesaria
     }
 }

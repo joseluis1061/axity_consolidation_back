@@ -18,10 +18,10 @@ public interface SucursalProductoMapper {
 
     SucursalProductoMapper INSTANCE = Mappers.getMapper(SucursalProductoMapper.class);
 
-    @Mapping(target = "conciliaciones", ignore = true)
+    @Mapping(target = "conciliaciones", source = "conciliaciones")
     SucursalProducto entityToModel(SucursalProductoEntity entity);
 
-    @Mapping(target = "conciliaciones", ignore = true)
+    @Mapping(target = "conciliaciones", source = "conciliaciones")
     SucursalProductoEntity modelToEntity(SucursalProducto model);
 
     List<SucursalProducto> entityListToModelList(List<SucursalProductoEntity> entities);
