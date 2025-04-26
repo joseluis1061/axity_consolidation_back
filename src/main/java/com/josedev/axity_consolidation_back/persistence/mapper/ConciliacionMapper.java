@@ -13,10 +13,11 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {
+        SucursalProductoMapper.class,
+        EstadoConciliacionMapper.class,
         SucursalMapper.class,
         ProductoMapper.class,
-        DocumentoMapper.class,
-        EstadoConciliacionMapper.class
+        DocumentoMapper.class
 })
 public interface ConciliacionMapper {
 
@@ -32,29 +33,23 @@ public interface ConciliacionMapper {
     @Mapping(target = "sucursal", expression = "java(sucursalMapper.entityToModel(entity.getSucursalProducto().getSucursal()))")
     @Mapping(target = "producto", expression = "java(productoMapper.entityToModel(entity.getSucursalProducto().getProducto()))")
     @Mapping(target = "documento", expression = "java(documentoMapper.entityToModel(entity.getSucursalProducto().getDocumento()))")
-    @Mapping(target = "estadoConciliacion", expression = "java(estadoConciliacionMapper.entityToModel(entity.getEstadoConciliacion()))")
     Conciliacion entityToModel(ConciliacionEntity entity);
 
+    @Mapping(target = "sucursalProducto", ignore = true)
     ConciliacionEntity modelToEntity(Conciliacion model);
 
-    // Mapeo de modelo a DTO (para la API)
     ConciliacionDTO modelToDto(Conciliacion model);
 
-    // Mapeo de DTO a modelo
     Conciliacion dtoToModel(ConciliacionDTO dto);
 
     List<Conciliacion> entityListToModelList(List<ConciliacionEntity> entities);
 
     List<ConciliacionDTO> modelListToDtoList(List<Conciliacion> models);
 
-    // Para el filtro de conciliaciones
     ConciliacionFiltro dtoToFiltroModel(ConciliacionFiltroDTO dto);
 
-    // Para el resultado del proceso batch
-    @Mapping(source = "conciliacionesDescuadradas", target = "conciliacionesDescuadradas")
     ProcesoBatchResponseDTO resultToResponseDto(ProcesoBatchResult result);
 
-    // Método para post-procesamiento después del mapeo
     @AfterMapping
     default void afterMapping(@MappingTarget Conciliacion conciliacion, ConciliacionEntity entity) {
         if (entity.getSucursalProducto() != null) {

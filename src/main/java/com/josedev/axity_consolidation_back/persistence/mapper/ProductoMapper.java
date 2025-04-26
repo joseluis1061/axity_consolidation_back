@@ -4,6 +4,7 @@ import com.josedev.axity_consolidation_back.domain.model.Producto;
 import com.josedev.axity_consolidation_back.persistence.entity.ProductoEntity;
 import com.josedev.axity_consolidation_back.web.dto.ProductoDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -13,8 +14,10 @@ public interface ProductoMapper {
 
     ProductoMapper INSTANCE = Mappers.getMapper(ProductoMapper.class);
 
+    @Mapping(target = "sucursalProductos", ignore = true)
     Producto entityToModel(ProductoEntity entity);
 
+    @Mapping(target = "sucursalProductos", ignore = true)
     ProductoEntity modelToEntity(Producto model);
 
     ProductoDTO modelToDto(Producto model);

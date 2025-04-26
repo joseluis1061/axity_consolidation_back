@@ -1,3 +1,4 @@
+// Producto.java
 package com.josedev.axity_consolidation_back.domain.model;
 
 import lombok.AllArgsConstructor;
