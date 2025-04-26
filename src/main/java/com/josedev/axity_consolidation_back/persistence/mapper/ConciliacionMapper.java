@@ -8,9 +8,11 @@ import com.josedev.axity_consolidation_back.web.dto.ConciliacionDTO;
 import com.josedev.axity_consolidation_back.web.dto.ConciliacionFiltroDTO;
 import com.josedev.axity_consolidation_back.web.dto.ProcesoBatchResponseDTO;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = {
         SucursalProductoMapper.class,
@@ -21,21 +23,24 @@ import java.util.List;
 })
 public interface ConciliacionMapper {
 
-    ConciliacionMapper INSTANCE = Mappers.getMapper(ConciliacionMapper.class);
+    // Eliminamos la instancia estática ya que usamos inyección de dependencias
+    // ConciliacionMapper INSTANCE = Mappers.getMapper(ConciliacionMapper.class);
 
-    @Mapping(target = "codigoSucursal", expression = "java(entity.getSucursalProducto().getSucursal().getCodigoSucursal())")
-    @Mapping(target = "nombreSucursal", expression = "java(entity.getSucursalProducto().getSucursal().getNombreSucursal())")
-    @Mapping(target = "codigoProducto", expression = "java(entity.getSucursalProducto().getProducto().getCodigoProducto())")
-    @Mapping(target = "nombreProducto", expression = "java(entity.getSucursalProducto().getProducto().getNombreProducto())")
-    @Mapping(target = "codigoDocumento", expression = "java(entity.getSucursalProducto().getDocumento().getCodigoDocumento())")
-    @Mapping(target = "codigoEstado", expression = "java(entity.getEstadoConciliacion().getCodigoEstado())")
-    @Mapping(target = "descripcionEstado", expression = "java(entity.getEstadoConciliacion().getDescripcion())")
-    @Mapping(target = "sucursal", expression = "java(sucursalMapper.entityToModel(entity.getSucursalProducto().getSucursal()))")
-    @Mapping(target = "producto", expression = "java(productoMapper.entityToModel(entity.getSucursalProducto().getProducto()))")
-    @Mapping(target = "documento", expression = "java(documentoMapper.entityToModel(entity.getSucursalProducto().getDocumento()))")
+    // Simplificamos las anotaciones, dejando la lógica compleja para el afterMapping
+    @Mapping(target = "codigoSucursal", ignore = true)
+    @Mapping(target = "nombreSucursal", ignore = true)
+    @Mapping(target = "codigoProducto", ignore = true)
+    @Mapping(target = "nombreProducto", ignore = true)
+    @Mapping(target = "codigoDocumento", ignore = true)
+    @Mapping(target = "codigoEstado", ignore = true)
+    @Mapping(target = "descripcionEstado", ignore = true)
+    @Mapping(target = "sucursal", ignore = true)
+    @Mapping(target = "producto", ignore = true)
+    @Mapping(target = "documento", ignore = true)
     Conciliacion entityToModel(ConciliacionEntity entity);
 
     @Mapping(target = "sucursalProducto", ignore = true)
+    @Mapping(target = "estadoConciliacion", ignore = true)
     ConciliacionEntity modelToEntity(Conciliacion model);
 
     ConciliacionDTO modelToDto(Conciliacion model);
@@ -52,22 +57,52 @@ public interface ConciliacionMapper {
 
     @AfterMapping
     default void afterMapping(@MappingTarget Conciliacion conciliacion, ConciliacionEntity entity) {
+        // Manejo seguro de nulos para SucursalProducto
         if (entity.getSucursalProducto() != null) {
+            // Sucursal
             if (entity.getSucursalProducto().getSucursal() != null) {
                 conciliacion.setCodigoSucursal(entity.getSucursalProducto().getSucursal().getCodigoSucursal());
                 conciliacion.setNombreSucursal(entity.getSucursalProducto().getSucursal().getNombreSucursal());
+                conciliacion.setSucursal(SucursalMapper.INSTANCE.entityToModel(entity.getSucursalProducto().getSucursal()));
             }
+
+            // Producto
             if (entity.getSucursalProducto().getProducto() != null) {
                 conciliacion.setCodigoProducto(entity.getSucursalProducto().getProducto().getCodigoProducto());
                 conciliacion.setNombreProducto(entity.getSucursalProducto().getProducto().getNombreProducto());
+                conciliacion.setProducto(ProductoMapper.INSTANCE.entityToModel(entity.getSucursalProducto().getProducto()));
             }
+
+            // Documento
             if (entity.getSucursalProducto().getDocumento() != null) {
                 conciliacion.setCodigoDocumento(entity.getSucursalProducto().getDocumento().getCodigoDocumento());
+                conciliacion.setDocumento(DocumentoMapper.INSTANCE.entityToModel(entity.getSucursalProducto().getDocumento()));
             }
         }
+
+        // Estado de conciliación
         if (entity.getEstadoConciliacion() != null) {
             conciliacion.setCodigoEstado(entity.getEstadoConciliacion().getCodigoEstado());
             conciliacion.setDescripcionEstado(entity.getEstadoConciliacion().getDescripcion());
         }
+    }
+
+    // Método para mapear un Page de entidades a un Page de DTOs
+    default Page<ConciliacionDTO> entityPageToDtoPage(Page<ConciliacionEntity> entityPage) {
+        List<Conciliacion> models = entityListToModelList(entityPage.getContent());
+        List<ConciliacionDTO> dtos = modelListToDtoList(models);
+        return new PageImpl<>(dtos, entityPage.getPageable(), entityPage.getTotalElements());
+    }
+
+    // Método para mapear un Page de entidades a un Page de modelos
+    default Page<Conciliacion> entityPageToModelPage(Page<ConciliacionEntity> entityPage) {
+        List<Conciliacion> models = entityListToModelList(entityPage.getContent());
+        return new PageImpl<>(models, entityPage.getPageable(), entityPage.getTotalElements());
+    }
+
+    // Método para configurar la entidad a partir del modelo al guardar
+    @AfterMapping
+    default void afterModelToEntityMapping(@MappingTarget ConciliacionEntity entity, Conciliacion model) {
+        // Aquí puedes implementar lógica adicional si es necesaria
     }
 }
