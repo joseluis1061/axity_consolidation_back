@@ -5,41 +5,68 @@ import com.josedev.axity_consolidation_back.domain.model.EstadoConciliacion;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Interfaz que define las operaciones de servicio para la entidad EstadoConciliacion.
+ */
 public interface EstadoConciliacionService {
 
     /**
-     * Obtiene todos los estados de conciliación
-     * @return Lista de todos los estados de conciliación
+     * Obtiene todos los estados de conciliación disponibles
+     *
+     * @return Lista de estados de conciliación
      */
-    List<EstadoConciliacion> obtenerTodosLosEstados();
+    List<EstadoConciliacion> getAllEstadosConciliacion();
 
     /**
-     * Obtiene un estado de conciliación por su código
-     * @param codigoEstado Código del estado a buscar
-     * @return Optional conteniendo el estado si existe
+     * Busca un estado de conciliación por su código
+     *
+     * @param codigoEstado Código único del estado de conciliación
+     * @return Optional con el estado de conciliación si existe, empty si no
      */
-    Optional<EstadoConciliacion> obtenerEstadoPorCodigo(String codigoEstado);
+    Optional<EstadoConciliacion> getEstadoConciliacionById(String codigoEstado);
 
     /**
-     * Guarda un estado de conciliación (nuevo o existente)
-     * @param estadoConciliacion Estado a guardar
-     * @return Estado guardado
-     * @throws IllegalArgumentException si el estado no cumple las validaciones
+     * Guarda un nuevo estado de conciliación
+     *
+     * @param estadoConciliacion El estado de conciliación a guardar
+     * @return El estado de conciliación guardado con posibles modificaciones
      */
-    EstadoConciliacion guardarEstado(EstadoConciliacion estadoConciliacion);
+    EstadoConciliacion saveEstadoConciliacion(EstadoConciliacion estadoConciliacion);
+
+    /**
+     * Actualiza un estado de conciliación existente
+     *
+     * @param codigoEstado Código del estado de conciliación a actualizar
+     * @param estadoConciliacion Datos actualizados del estado de conciliación
+     * @return El estado de conciliación actualizado o Optional.empty() si no se encontró
+     */
+    Optional<EstadoConciliacion> updateEstadoConciliacion(String codigoEstado, EstadoConciliacion estadoConciliacion);
 
     /**
      * Elimina un estado de conciliación por su código
-     * @param codigoEstado Código del estado a eliminar
-     * @return true si el estado fue eliminado, false si no existía
-     * @throws IllegalStateException si hay conciliaciones asociadas al estado
+     *
+     * @param codigoEstado Código del estado de conciliación a eliminar
+     * @return true si se eliminó correctamente, false si no existe
      */
-    boolean eliminarEstado(String codigoEstado);
+    boolean deleteEstadoConciliacion(String codigoEstado);
 
     /**
-     * Verifica si un código de estado es válido
-     * @param codigoEstado Código a verificar
-     * @return true si el código corresponde a un estado existente
+     * Verifica si existe un estado de conciliación con el código especificado
+     *
+     * @param codigoEstado Código del estado de conciliación a verificar
+     * @return true si existe, false si no
      */
-    boolean esEstadoValido(String codigoEstado);
+    boolean existsEstadoConciliacion(String codigoEstado);
 }
+/*
+    List<EstadoConciliacion> obtenerTodosLosEstados();
+
+    Optional<EstadoConciliacion> obtenerEstadoPorCodigo(String codigoEstado);
+
+    EstadoConciliacion guardarEstado(EstadoConciliacion estadoConciliacion);
+
+
+    boolean eliminarEstado(String codigoEstado);
+
+    boolean esEstadoValido(String codigoEstado);
+ */

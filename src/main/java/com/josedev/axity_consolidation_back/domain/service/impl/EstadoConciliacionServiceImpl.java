@@ -5,20 +5,86 @@ import com.josedev.axity_consolidation_back.domain.service.EstadoConciliacionSer
 import com.josedev.axity_consolidation_back.persistence.entity.EstadoConciliacionEntity;
 import com.josedev.axity_consolidation_back.persistence.mapper.EstadoConciliacionMapper;
 import com.josedev.axity_consolidation_back.persistence.repository.EstadoConciliacionRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de la interfaz EstadoConciliacionService que define la lógica de negocio
+ * para la gestión de estados de conciliación.
+ */
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class EstadoConciliacionServiceImpl implements EstadoConciliacionService {
 
     private final EstadoConciliacionRepository estadoConciliacionRepository;
+    private final EstadoConciliacionMapper estadoConciliacionMapper;
+
+    @Autowired
+    public EstadoConciliacionServiceImpl(EstadoConciliacionRepository estadoConciliacionRepository,
+                                         EstadoConciliacionMapper estadoConciliacionMapper) {
+        this.estadoConciliacionRepository = estadoConciliacionRepository;
+        this.estadoConciliacionMapper = estadoConciliacionMapper;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EstadoConciliacion> getAllEstadosConciliacion() {
+        List<EstadoConciliacionEntity> entities = estadoConciliacionRepository.findAll();
+        return estadoConciliacionMapper.toEstadoConciliacionList(entities);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<EstadoConciliacion> getEstadoConciliacionById(String codigoEstado) {
+        return estadoConciliacionRepository.findById(codigoEstado)
+                .map(estadoConciliacionMapper::toEstadoConciliacion);
+    }
+
+    @Override
+    @Transactional
+    public EstadoConciliacion saveEstadoConciliacion(EstadoConciliacion estadoConciliacion) {
+        EstadoConciliacionEntity entity = estadoConciliacionMapper.toEstadoConciliacionEntity(estadoConciliacion);
+        EstadoConciliacionEntity savedEntity = estadoConciliacionRepository.save(entity);
+        return estadoConciliacionMapper.toEstadoConciliacion(savedEntity);
+    }
+
+    @Override
+    @Transactional
+    public Optional<EstadoConciliacion> updateEstadoConciliacion(String codigoEstado, EstadoConciliacion estadoConciliacion) {
+        if (!estadoConciliacionRepository.existsById(codigoEstado)) {
+            return Optional.empty();
+        }
+
+        // Aseguramos que el código del estado a actualizar sea el correcto
+        estadoConciliacion.setCodigoEstado(codigoEstado);
+
+        EstadoConciliacionEntity entity = estadoConciliacionMapper.toEstadoConciliacionEntity(estadoConciliacion);
+        EstadoConciliacionEntity updatedEntity = estadoConciliacionRepository.save(entity);
+        return Optional.of(estadoConciliacionMapper.toEstadoConciliacion(updatedEntity));
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteEstadoConciliacion(String codigoEstado) {
+        if (!estadoConciliacionRepository.existsById(codigoEstado)) {
+            return false;
+        }
+
+        estadoConciliacionRepository.deleteById(codigoEstado);
+        return true;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsEstadoConciliacion(String codigoEstado) {
+        return estadoConciliacionRepository.existsById(codigoEstado);
+    }
+}
+/*
+private final EstadoConciliacionRepository estadoConciliacionRepository;
     private final EstadoConciliacionMapper estadoConciliacionMapper;
 
     @Override
@@ -98,4 +164,4 @@ public class EstadoConciliacionServiceImpl implements EstadoConciliacionService 
 
         return estadoConciliacionRepository.existsById(codigoEstado);
     }
-}
+ */
