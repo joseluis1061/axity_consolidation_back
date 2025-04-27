@@ -14,14 +14,10 @@ public interface DocumentoMapper {
 
     DocumentoMapper INSTANCE = Mappers.getMapper(DocumentoMapper.class);
 
-    @Mapping(target = "sucursalProductos", source = "sucursalProductos")
     Documento entityToModel(DocumentoEntity entity);
 
-    @Mapping(target = "sucursalProductos", source = "sucursalProductos")
     DocumentoEntity modelToEntity(Documento model);
 
-    @Mapping(target = "codigoDocumento", source = "codigoDocumento")
-    @Mapping(target = "descripcion", source = "descripcion")
     DocumentoDTO modelToDto(Documento model);
 
     Documento dtoToModel(DocumentoDTO dto);

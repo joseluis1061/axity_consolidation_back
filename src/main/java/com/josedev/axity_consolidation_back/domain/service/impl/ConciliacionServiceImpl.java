@@ -245,9 +245,10 @@ public class ConciliacionServiceImpl implements ConciliacionService {
             throw new IllegalArgumentException("La conciliación no puede ser nula");
         }
 
+        /*
         if (!conciliacion.esValida()) {
             throw new IllegalArgumentException("La conciliación no tiene datos válidos");
-        }
+        }*/
 
         // Mapear modelo a entidad
         ConciliacionEntity entidad = conciliacionMapper.modelToEntity(conciliacion);

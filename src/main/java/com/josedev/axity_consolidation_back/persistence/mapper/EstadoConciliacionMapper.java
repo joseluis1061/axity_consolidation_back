@@ -14,14 +14,10 @@ public interface EstadoConciliacionMapper {
 
     EstadoConciliacionMapper INSTANCE = Mappers.getMapper(EstadoConciliacionMapper.class);
 
-    @Mapping(target = "conciliaciones", source = "conciliaciones")
     EstadoConciliacion entityToModel(EstadoConciliacionEntity entity);
 
-    @Mapping(target = "conciliaciones", source = "conciliaciones")
     EstadoConciliacionEntity modelToEntity(EstadoConciliacion model);
 
-    @Mapping(target = "codigoEstado", source = "codigoEstado")
-    @Mapping(target = "descripcion", source = "descripcion")
     EstadoConciliacionDTO modelToDto(EstadoConciliacion model);
 
     EstadoConciliacion dtoToModel(EstadoConciliacionDTO dto);

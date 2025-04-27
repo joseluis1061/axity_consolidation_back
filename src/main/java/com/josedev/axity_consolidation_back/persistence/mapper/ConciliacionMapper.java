@@ -22,33 +22,10 @@ import java.util.List;
 })
 public interface ConciliacionMapper {
 
-    @Mapping(target = "codigoSucursal", source = "sucursalProducto.sucursal.codigoSucursal")
-    @Mapping(target = "nombreSucursal", source = "sucursalProducto.sucursal.nombreSucursal")
-    @Mapping(target = "codigoProducto", source = "sucursalProducto.producto.codigoProducto")
-    @Mapping(target = "nombreProducto", source = "sucursalProducto.producto.nombreProducto")
-    @Mapping(target = "codigoDocumento", source = "sucursalProducto.documento.codigoDocumento")
-    @Mapping(target = "codigoEstado", source = "estadoConciliacion.codigoEstado")
-    @Mapping(target = "descripcionEstado", source = "estadoConciliacion.descripcion")
-    @Mapping(target = "sucursal", source = "sucursalProducto.sucursal")
-    @Mapping(target = "producto", source = "sucursalProducto.producto")
-    @Mapping(target = "documento", source = "sucursalProducto.documento")
     Conciliacion entityToModel(ConciliacionEntity entity);
 
-    @Mapping(target = "sucursalProducto", source = "sucursalProducto")
-    @Mapping(target = "estadoConciliacion", source = "estadoConciliacion")
     ConciliacionEntity modelToEntity(Conciliacion model);
 
-    @Mapping(target = "idConciliacion", source = "idConciliacion")
-    @Mapping(target = "fechaConciliacion", source = "fechaConciliacion")
-    @Mapping(target = "codigoSucursal", source = "codigoSucursal")
-    @Mapping(target = "nombreSucursal", source = "nombreSucursal")
-    @Mapping(target = "codigoProducto", source = "codigoProducto")
-    @Mapping(target = "nombreProducto", source = "nombreProducto")
-    @Mapping(target = "codigoDocumento", source = "codigoDocumento")
-    @Mapping(target = "diferenciaFisica", source = "diferenciaFisica")
-    @Mapping(target = "diferenciaValor", source = "diferenciaValor")
-    @Mapping(target = "codigoEstado", source = "codigoEstado")
-    @Mapping(target = "descripcionEstado", source = "descripcionEstado")
     ConciliacionDTO modelToDto(Conciliacion model);
 
     Conciliacion dtoToModel(ConciliacionDTO dto);
@@ -59,12 +36,6 @@ public interface ConciliacionMapper {
 
     ConciliacionFiltro dtoToFiltroModel(ConciliacionFiltroDTO dto);
 
-    @Mapping(target = "year", source = "year")
-    @Mapping(target = "month", source = "month")
-    @Mapping(target = "totalProcesados", source = "totalProcesados")
-    @Mapping(target = "totalDescuadrados", source = "totalDescuadrados")
-    @Mapping(target = "fechaProceso", source = "fechaProceso")
-    @Mapping(target = "conciliacionesDescuadradas", source = "conciliacionesDescuadradas", qualifiedByName = "conciliacionesToDTOs")
     ProcesoBatchResponseDTO resultToResponseDto(ProcesoBatchResult result);
 
     @Named("conciliacionesToDTOs")
