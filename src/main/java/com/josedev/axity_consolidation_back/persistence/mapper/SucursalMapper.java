@@ -10,15 +10,16 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SucursalMapper {
 
-    // Entity to Domain
+    @Mapping(source = "codigoSucursal", target = "codigoSucursal")
+    @Mapping(source = "nombreSucursal", target = "nombreSucursal")
     Sucursal toSucursal(SucursalEntity entity);
+
     List<Sucursal> toSucursales(List<SucursalEntity> entities);
 
-    // Domain to Entity
+    @Mapping(source = "codigoSucursal", target = "codigoSucursal")
+    @Mapping(source = "nombreSucursal", target = "nombreSucursal")
     SucursalEntity toSucursalEntity(Sucursal sucursal);
-
 }
-
 /*
     SucursalMapper INSTANCE = Mappers.getMapper(SucursalMapper.class);
 
