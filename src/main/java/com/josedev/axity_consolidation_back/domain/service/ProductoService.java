@@ -5,34 +5,56 @@ import com.josedev.axity_consolidation_back.domain.model.Producto;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Interfaz que define las operaciones de servicio para la entidad Producto.
+ */
 public interface ProductoService {
 
     /**
-     * Obtiene todos los productos
-     * @return Lista de todos los productos
+     * Obtiene todos los productos disponibles
+     *
+     * @return Lista de productos
      */
-    List<Producto> obtenerTodosLosProductos();
+    List<Producto> getAllProductos();
 
     /**
-     * Obtiene un producto por su código
-     * @param codigoProducto Código del producto a buscar
-     * @return Optional conteniendo el producto si existe
+     * Busca un producto por su código
+     *
+     * @param codigoProducto Código único del producto
+     * @return Optional con el producto si existe, empty si no
      */
-    Optional<Producto> obtenerProductoPorCodigo(String codigoProducto);
+    Optional<Producto> getProductoById(String codigoProducto);
 
     /**
-     * Guarda un producto (nuevo o existente)
-     * @param producto Producto a guardar
-     * @return Producto guardado
-     * @throws IllegalArgumentException si el producto no cumple las validaciones
+     * Guarda un nuevo producto
+     *
+     * @param producto El producto a guardar
+     * @return El producto guardado con posibles modificaciones (ej: ID generado)
      */
-    Producto guardarProducto(Producto producto);
+    Producto saveProducto(Producto producto);
+
+    /**
+     * Actualiza un producto existente
+     *
+     * @param codigoProducto Código del producto a actualizar
+     * @param producto Datos actualizados del producto
+     * @return El producto actualizado o null si no se encontró
+     */
+    Optional<Producto> updateProducto(String codigoProducto, Producto producto);
 
     /**
      * Elimina un producto por su código
+     *
      * @param codigoProducto Código del producto a eliminar
-     * @return true si el producto fue eliminado, false si no existía
-     * @throws IllegalStateException si hay conciliaciones asociadas al producto
+     * @return true si se eliminó correctamente, false si no existe
      */
-    boolean eliminarProducto(String codigoProducto);
+    boolean deleteProducto(String codigoProducto);
+
+    /**
+     * Verifica si existe un producto con el código especificado
+     *
+     * @param codigoProducto Código del producto a verificar
+     * @return true si existe, false si no
+     */
+    boolean existsProducto(String codigoProducto);
 }

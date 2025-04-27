@@ -6,86 +6,87 @@ import com.josedev.axity_consolidation_back.persistence.entity.ProductoEntity;
 import com.josedev.axity_consolidation_back.persistence.mapper.ProductoMapper;
 import com.josedev.axity_consolidation_back.persistence.repository.ProductoRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de la interfaz ProductoService que proporciona
+ * la lógica de negocio para las operaciones con productos.
+ */
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Transactional
 public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
     private final ProductoMapper productoMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
-    public List<Producto> obtenerTodosLosProductos() {
-        log.info("Obteniendo todos los productos");
-        return productoMapper.entityListToModelList(productoRepository.findAll());
+    public List<Producto> getAllProductos() {
+        List<ProductoEntity> productoEntities = productoRepository.findAll();
+        return productoMapper.toProductoList(productoEntities);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
-    public Optional<Producto> obtenerProductoPorCodigo(String codigoProducto) {
-        log.info("Obteniendo producto con código: {}", codigoProducto);
-
-        if (codigoProducto == null || codigoProducto.isEmpty()) {
-            throw new IllegalArgumentException("El código de producto no puede ser nulo o vacío");
-        }
-
+    public Optional<Producto> getProductoById(String codigoProducto) {
         return productoRepository.findById(codigoProducto)
-                .map(productoMapper::entityToModel);
+                .map(productoMapper::toProducto);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    @Transactional
-    public Producto guardarProducto(Producto producto) {
-        log.info("Guardando producto: {}", producto);
-
-        if (producto == null) {
-            throw new IllegalArgumentException("El producto no puede ser nulo");
-        }
-
-        if (producto.getCodigoProducto() == null || producto.getCodigoProducto().isEmpty()) {
-            throw new IllegalArgumentException("El código de producto no puede ser nulo o vacío");
-        }
-
-        if (producto.getNombreProducto() == null || producto.getNombreProducto().isEmpty()) {
-            throw new IllegalArgumentException("El nombre del producto no puede ser nulo o vacío");
-        }
-
-        ProductoEntity entidad = productoMapper.modelToEntity(producto);
-        ProductoEntity guardado = productoRepository.save(entidad);
-
-        log.info("Producto guardado con código: {}", guardado.getCodigoProducto());
-        return productoMapper.entityToModel(guardado);
+    public Producto saveProducto(Producto producto) {
+        ProductoEntity productoEntity = productoMapper.toProductoEntity(producto);
+        ProductoEntity savedEntity = productoRepository.save(productoEntity);
+        return productoMapper.toProducto(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    @Transactional
-    public boolean eliminarProducto(String codigoProducto) {
-        log.info("Eliminando producto con código: {}", codigoProducto);
-
-        if (codigoProducto == null || codigoProducto.isEmpty()) {
-            throw new IllegalArgumentException("El código de producto no puede ser nulo o vacío");
+    public Optional<Producto> updateProducto(String codigoProducto, Producto producto) {
+        if (productoRepository.existsById(codigoProducto)) {
+            // Asegurarse de que el código del producto sea el correcto
+            producto.setCodigoProducto(codigoProducto);
+            ProductoEntity productoEntity = productoMapper.toProductoEntity(producto);
+            ProductoEntity updatedEntity = productoRepository.save(productoEntity);
+            return Optional.of(productoMapper.toProducto(updatedEntity));
         }
+        return Optional.empty();
+    }
 
-        if (!productoRepository.existsById(codigoProducto)) {
-            log.warn("No se encontró producto con código: {}", codigoProducto);
-            return false;
-        }
-
-        try {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean deleteProducto(String codigoProducto) {
+        if (productoRepository.existsById(codigoProducto)) {
             productoRepository.deleteById(codigoProducto);
-            log.info("Producto eliminado correctamente");
             return true;
-        } catch (Exception e) {
-            log.error("Error al eliminar producto: {}", e.getMessage());
-            throw new IllegalStateException("No se puede eliminar el producto porque está siendo utilizado", e);
         }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsProducto(String codigoProducto) {
+        return productoRepository.existsById(codigoProducto);
     }
 }
