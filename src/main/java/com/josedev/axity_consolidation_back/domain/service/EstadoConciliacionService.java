@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interfaz que define las operaciones de servicio para la entidad EstadoConciliacion.
+ * Interfaz que define las operaciones de servicio para los estados de conciliación.
  */
 public interface EstadoConciliacionService {
 
     /**
-     * Obtiene todos los estados de conciliación disponibles
+     * Obtiene todos los estados de conciliación
      *
      * @return Lista de estados de conciliación
      */
@@ -20,53 +20,57 @@ public interface EstadoConciliacionService {
     /**
      * Busca un estado de conciliación por su código
      *
-     * @param codigoEstado Código único del estado de conciliación
-     * @return Optional con el estado de conciliación si existe, empty si no
+     * @param codigoEstado Código del estado
+     * @return Optional con el estado si existe, empty si no
      */
     Optional<EstadoConciliacion> getEstadoConciliacionById(String codigoEstado);
 
     /**
+     * Busca un estado de conciliación por su descripción
+     *
+     * @param descripcion Descripción del estado
+     * @return Optional con el estado si existe, empty si no
+     */
+    Optional<EstadoConciliacion> getEstadoConciliacionByDescripcion(String descripcion);
+
+    /**
      * Guarda un nuevo estado de conciliación
      *
-     * @param estadoConciliacion El estado de conciliación a guardar
-     * @return El estado de conciliación guardado con posibles modificaciones
+     * @param estadoConciliacion Estado a guardar
+     * @return Estado guardado
      */
     EstadoConciliacion saveEstadoConciliacion(EstadoConciliacion estadoConciliacion);
 
     /**
      * Actualiza un estado de conciliación existente
      *
-     * @param codigoEstado Código del estado de conciliación a actualizar
-     * @param estadoConciliacion Datos actualizados del estado de conciliación
-     * @return El estado de conciliación actualizado o Optional.empty() si no se encontró
+     * @param codigoEstado Código del estado a actualizar
+     * @param estadoConciliacion Datos actualizados del estado
+     * @return Optional con el estado actualizado, o empty si no existe
      */
-    Optional<EstadoConciliacion> updateEstadoConciliacion(String codigoEstado, EstadoConciliacion estadoConciliacion);
+    Optional<EstadoConciliacion> updateEstadoConciliacion(
+            String codigoEstado, EstadoConciliacion estadoConciliacion);
 
     /**
-     * Elimina un estado de conciliación por su código
+     * Elimina un estado de conciliación
      *
-     * @param codigoEstado Código del estado de conciliación a eliminar
+     * @param codigoEstado Código del estado a eliminar
      * @return true si se eliminó correctamente, false si no existe
      */
     boolean deleteEstadoConciliacion(String codigoEstado);
 
     /**
-     * Verifica si existe un estado de conciliación con el código especificado
+     * Obtiene el estado "Descuadrada" (código 'D')
      *
-     * @param codigoEstado Código del estado de conciliación a verificar
+     * @return Optional con el estado "Descuadrada", o empty si no existe
+     */
+    Optional<EstadoConciliacion> getEstadoDescuadrada();
+
+    /**
+     * Verifica si existe un estado con el código especificado
+     *
+     * @param codigoEstado Código del estado a verificar
      * @return true si existe, false si no
      */
     boolean existsEstadoConciliacion(String codigoEstado);
 }
-/*
-    List<EstadoConciliacion> obtenerTodosLosEstados();
-
-    Optional<EstadoConciliacion> obtenerEstadoPorCodigo(String codigoEstado);
-
-    EstadoConciliacion guardarEstado(EstadoConciliacion estadoConciliacion);
-
-
-    boolean eliminarEstado(String codigoEstado);
-
-    boolean esEstadoValido(String codigoEstado);
- */

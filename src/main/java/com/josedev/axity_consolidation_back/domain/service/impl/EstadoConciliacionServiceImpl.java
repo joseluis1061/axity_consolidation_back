@@ -5,7 +5,8 @@ import com.josedev.axity_consolidation_back.domain.service.EstadoConciliacionSer
 import com.josedev.axity_consolidation_back.persistence.entity.EstadoConciliacionEntity;
 import com.josedev.axity_consolidation_back.persistence.mapper.EstadoConciliacionMapper;
 import com.josedev.axity_consolidation_back.persistence.repository.EstadoConciliacionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,155 +14,162 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementación de la interfaz EstadoConciliacionService que define la lógica de negocio
- * para la gestión de estados de conciliación.
+ * Implementación de la interfaz EstadoConciliacionService.
+ * Proporciona la lógica de negocio para las operaciones relacionadas con estados de conciliación.
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class EstadoConciliacionServiceImpl implements EstadoConciliacionService {
 
     private final EstadoConciliacionRepository estadoConciliacionRepository;
     private final EstadoConciliacionMapper estadoConciliacionMapper;
 
-    @Autowired
-    public EstadoConciliacionServiceImpl(EstadoConciliacionRepository estadoConciliacionRepository,
-                                         EstadoConciliacionMapper estadoConciliacionMapper) {
-        this.estadoConciliacionRepository = estadoConciliacionRepository;
-        this.estadoConciliacionMapper = estadoConciliacionMapper;
-    }
-
+    /**
+     * Obtiene todos los estados de conciliación
+     *
+     * @return Lista de estados de conciliación
+     */
     @Override
     @Transactional(readOnly = true)
     public List<EstadoConciliacion> getAllEstadosConciliacion() {
+        log.info("Obteniendo todos los estados de conciliación");
         List<EstadoConciliacionEntity> entities = estadoConciliacionRepository.findAll();
         return estadoConciliacionMapper.toEstadoConciliacionList(entities);
     }
 
+    /**
+     * Busca un estado de conciliación por su código
+     *
+     * @param codigoEstado Código del estado
+     * @return Optional con el estado si existe, empty si no
+     */
     @Override
     @Transactional(readOnly = true)
     public Optional<EstadoConciliacion> getEstadoConciliacionById(String codigoEstado) {
+        log.info("Buscando estado de conciliación con código: {}", codigoEstado);
         return estadoConciliacionRepository.findById(codigoEstado)
                 .map(estadoConciliacionMapper::toEstadoConciliacion);
     }
 
+    /**
+     * Busca un estado de conciliación por su descripción
+     *
+     * @param descripcion Descripción del estado
+     * @return Optional con el estado si existe, empty si no
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<EstadoConciliacion> getEstadoConciliacionByDescripcion(String descripcion) {
+        log.info("Buscando estado de conciliación con descripción: {}", descripcion);
+        return estadoConciliacionRepository.findByDescripcion(descripcion)
+                .map(estadoConciliacionMapper::toEstadoConciliacion);
+    }
+
+    /**
+     * Guarda un nuevo estado de conciliación
+     *
+     * @param estadoConciliacion Estado a guardar
+     * @return Estado guardado
+     */
     @Override
     @Transactional
     public EstadoConciliacion saveEstadoConciliacion(EstadoConciliacion estadoConciliacion) {
+        log.info("Guardando nuevo estado de conciliación: {}", estadoConciliacion);
+
+        // Verificar si ya existe un estado con el mismo código
+        if (existsEstadoConciliacion(estadoConciliacion.getCodigoEstado())) {
+            log.warn("Ya existe un estado con el código: {}", estadoConciliacion.getCodigoEstado());
+            return getEstadoConciliacionById(estadoConciliacion.getCodigoEstado())
+                    .orElse(estadoConciliacion);
+        }
+
+        // Verificar si ya existe un estado con la misma descripción
+        if (estadoConciliacionRepository.existsByDescripcion(estadoConciliacion.getDescripcion())) {
+            log.warn("Ya existe un estado con la descripción: {}", estadoConciliacion.getDescripcion());
+            return getEstadoConciliacionByDescripcion(estadoConciliacion.getDescripcion())
+                    .orElse(estadoConciliacion);
+        }
+
+        // Convertir y guardar
         EstadoConciliacionEntity entity = estadoConciliacionMapper.toEstadoConciliacionEntity(estadoConciliacion);
         EstadoConciliacionEntity savedEntity = estadoConciliacionRepository.save(entity);
         return estadoConciliacionMapper.toEstadoConciliacion(savedEntity);
     }
 
+    /**
+     * Actualiza un estado de conciliación existente
+     *
+     * @param codigoEstado Código del estado a actualizar
+     * @param estadoConciliacion Datos actualizados del estado
+     * @return Optional con el estado actualizado, o empty si no existe
+     */
     @Override
     @Transactional
-    public Optional<EstadoConciliacion> updateEstadoConciliacion(String codigoEstado, EstadoConciliacion estadoConciliacion) {
-        if (!estadoConciliacionRepository.existsById(codigoEstado)) {
+    public Optional<EstadoConciliacion> updateEstadoConciliacion(
+            String codigoEstado, EstadoConciliacion estadoConciliacion) {
+        log.info("Actualizando estado de conciliación con código: {}", codigoEstado);
+
+        // Verificar que el código del estado coincide
+        if (!codigoEstado.equals(estadoConciliacion.getCodigoEstado())) {
+            log.warn("El código del estado no coincide: {} vs {}",
+                    codigoEstado, estadoConciliacion.getCodigoEstado());
             return Optional.empty();
         }
 
-        // Aseguramos que el código del estado a actualizar sea el correcto
-        estadoConciliacion.setCodigoEstado(codigoEstado);
+        return estadoConciliacionRepository.findById(codigoEstado)
+                .map(existingEntity -> {
+                    // Actualizar campos
+                    existingEntity.setDescripcion(estadoConciliacion.getDescripcion());
 
-        EstadoConciliacionEntity entity = estadoConciliacionMapper.toEstadoConciliacionEntity(estadoConciliacion);
-        EstadoConciliacionEntity updatedEntity = estadoConciliacionRepository.save(entity);
-        return Optional.of(estadoConciliacionMapper.toEstadoConciliacion(updatedEntity));
+                    // Guardar entidad actualizada
+                    EstadoConciliacionEntity updatedEntity = estadoConciliacionRepository.save(existingEntity);
+                    return estadoConciliacionMapper.toEstadoConciliacion(updatedEntity);
+                });
     }
 
+    /**
+     * Elimina un estado de conciliación
+     *
+     * @param codigoEstado Código del estado a eliminar
+     * @return true si se eliminó correctamente, false si no existe
+     */
     @Override
     @Transactional
     public boolean deleteEstadoConciliacion(String codigoEstado) {
-        if (!estadoConciliacionRepository.existsById(codigoEstado)) {
-            return false;
+        log.info("Eliminando estado de conciliación con código: {}", codigoEstado);
+
+        if (estadoConciliacionRepository.existsById(codigoEstado)) {
+            estadoConciliacionRepository.deleteById(codigoEstado);
+            return true;
         }
 
-        estadoConciliacionRepository.deleteById(codigoEstado);
-        return true;
+        return false;
     }
 
+    /**
+     * Obtiene el estado "Descuadrada" (código 'D')
+     *
+     * @return Optional con el estado "Descuadrada", o empty si no existe
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<EstadoConciliacion> getEstadoDescuadrada() {
+        log.info("Obteniendo estado 'Descuadrada'");
+        return estadoConciliacionRepository.findByCodigoEstado("D")
+                .map(estadoConciliacionMapper::toEstadoConciliacion);
+    }
+
+    /**
+     * Verifica si existe un estado con el código especificado
+     *
+     * @param codigoEstado Código del estado a verificar
+     * @return true si existe, false si no
+     */
     @Override
     @Transactional(readOnly = true)
     public boolean existsEstadoConciliacion(String codigoEstado) {
+        log.info("Verificando si existe estado con código: {}", codigoEstado);
         return estadoConciliacionRepository.existsById(codigoEstado);
     }
 }
-/*
-private final EstadoConciliacionRepository estadoConciliacionRepository;
-    private final EstadoConciliacionMapper estadoConciliacionMapper;
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<EstadoConciliacion> obtenerTodosLosEstados() {
-        log.info("Obteniendo todos los estados de conciliación");
-        return estadoConciliacionMapper.entityListToModelList(estadoConciliacionRepository.findAll());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<EstadoConciliacion> obtenerEstadoPorCodigo(String codigoEstado) {
-        log.info("Obteniendo estado de conciliación con código: {}", codigoEstado);
-
-        if (codigoEstado == null || codigoEstado.isEmpty()) {
-            throw new IllegalArgumentException("El código de estado no puede ser nulo o vacío");
-        }
-
-        return estadoConciliacionRepository.findById(codigoEstado)
-                .map(estadoConciliacionMapper::entityToModel);
-    }
-
-    @Override
-    @Transactional
-    public EstadoConciliacion guardarEstado(EstadoConciliacion estadoConciliacion) {
-        log.info("Guardando estado de conciliación: {}", estadoConciliacion);
-
-        if (estadoConciliacion == null) {
-            throw new IllegalArgumentException("El estado no puede ser nulo");
-        }
-
-        if (estadoConciliacion.getCodigoEstado() == null || estadoConciliacion.getCodigoEstado().isEmpty()) {
-            throw new IllegalArgumentException("El código de estado no puede ser nulo o vacío");
-        }
-
-        if (estadoConciliacion.getDescripcion() == null || estadoConciliacion.getDescripcion().isEmpty()) {
-            throw new IllegalArgumentException("La descripción no puede ser nula o vacía");
-        }
-
-        EstadoConciliacionEntity entidad = estadoConciliacionMapper.modelToEntity(estadoConciliacion);
-        EstadoConciliacionEntity guardado = estadoConciliacionRepository.save(entidad);
-
-        log.info("Estado guardado con código: {}", guardado.getCodigoEstado());
-        return estadoConciliacionMapper.entityToModel(guardado);
-    }
-
-    @Override
-    @Transactional
-    public boolean eliminarEstado(String codigoEstado) {
-        log.info("Eliminando estado con código: {}", codigoEstado);
-
-        if (codigoEstado == null || codigoEstado.isEmpty()) {
-            throw new IllegalArgumentException("El código de estado no puede ser nulo o vacío");
-        }
-
-        if (!estadoConciliacionRepository.existsById(codigoEstado)) {
-            log.warn("No se encontró estado con código: {}", codigoEstado);
-            return false;
-        }
-
-        try {
-            estadoConciliacionRepository.deleteById(codigoEstado);
-            log.info("Estado eliminado correctamente");
-            return true;
-        } catch (Exception e) {
-            log.error("Error al eliminar estado: {}", e.getMessage());
-            throw new IllegalStateException("No se puede eliminar el estado porque está siendo utilizado", e);
-        }
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean esEstadoValido(String codigoEstado) {
-        if (codigoEstado == null || codigoEstado.isEmpty()) {
-            return false;
-        }
-
-        return estadoConciliacionRepository.existsById(codigoEstado);
-    }
- */
