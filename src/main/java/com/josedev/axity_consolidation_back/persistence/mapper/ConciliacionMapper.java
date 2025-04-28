@@ -1,64 +1,51 @@
 package com.josedev.axity_consolidation_back.persistence.mapper;
 
 import com.josedev.axity_consolidation_back.domain.model.Conciliacion;
-import com.josedev.axity_consolidation_back.domain.model.ConciliacionFiltro;
-import com.josedev.axity_consolidation_back.domain.model.ProcesoBatchResult;
 import com.josedev.axity_consolidation_back.persistence.entity.ConciliacionEntity;
-import com.josedev.axity_consolidation_back.web.dto.ConciliacionDTO;
-import com.josedev.axity_consolidation_back.web.dto.ConciliacionFiltroDTO;
-import com.josedev.axity_consolidation_back.web.dto.ProcesoBatchResponseDTO;
-import org.mapstruct.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {
-        SucursalProductoMapper.class,
-        EstadoConciliacionMapper.class,
-        SucursalMapper.class,
-        ProductoMapper.class,
-        DocumentoMapper.class
-})
+/**
+ * Interfaz que define los métodos de mapeo entre ConciliacionEntity y Conciliacion.
+ * Utiliza MapStruct para la implementación automática de estos métodos.
+ */
+@Mapper(
+        componentModel = "spring",
+        uses = {
+                SucursalProductoMapper.class,
+                EstadoConciliacionMapper.class
+        }
+)
 public interface ConciliacionMapper {
 
-    Conciliacion entityToModel(ConciliacionEntity entity);
+    /**
+     * Convierte una entidad de Conciliacion a un modelo de dominio
+     * @param entity La entidad de Conciliacion proveniente de la base de datos
+     * @return El modelo de dominio Conciliacion
+     */
+    @Mapping(target = "sucursalProducto", source = "sucursalProducto")
+    @Mapping(target = "codigoSucursal", source = "sucursalProducto.id.codigoSucursal")
+    @Mapping(target = "codigoProducto", source = "sucursalProducto.id.codigoProducto")
+    @Mapping(target = "codigoDocumento", source = "sucursalProducto.id.codigoDocumento")
+    @Mapping(target = "estadoConciliacion", source = "estadoConciliacion")
+    @Mapping(target = "codigoEstado", source = "estadoConciliacion.codigoEstado")
+    Conciliacion toConciliacion(ConciliacionEntity entity);
 
-    ConciliacionEntity modelToEntity(Conciliacion model);
+    /**
+     * Convierte un modelo de dominio Conciliacion a una entidad de Conciliacion
+     * @param model El modelo de dominio Conciliacion
+     * @return La entidad de Conciliacion para persistir en base de datos
+     */
+    @Mapping(target = "sucursalProducto", source = "sucursalProducto")
+    @Mapping(target = "estadoConciliacion", source = "estadoConciliacion")
+    ConciliacionEntity toConciliacionEntity(Conciliacion model);
 
-    ConciliacionDTO modelToDto(Conciliacion model);
-
-    Conciliacion dtoToModel(ConciliacionDTO dto);
-
-    List<Conciliacion> entityListToModelList(List<ConciliacionEntity> entities);
-
-    List<ConciliacionDTO> modelListToDtoList(List<Conciliacion> models);
-
-    ConciliacionFiltro dtoToFiltroModel(ConciliacionFiltroDTO dto);
-
-    ProcesoBatchResponseDTO resultToResponseDto(ProcesoBatchResult result);
-
-    @Named("conciliacionesToDTOs")
-    default List<ConciliacionDTO> mapConciliacionesToDTOs(List<Conciliacion> conciliaciones) {
-        return modelListToDtoList(conciliaciones);
-    }
-
-    @AfterMapping
-    default void afterMapping(@MappingTarget Conciliacion conciliacion, ConciliacionEntity entity) {
-        // Este método se mantiene, pero ya no es necesario configurar propiedades manualmente
-        // porque los mapeos ya están correctamente definidos en las anotaciones @Mapping
-    }
-
-    // Método para mapear un Page de entidades a un Page de DTOs
-    default Page<ConciliacionDTO> entityPageToDtoPage(Page<ConciliacionEntity> entityPage) {
-        List<Conciliacion> models = entityListToModelList(entityPage.getContent());
-        List<ConciliacionDTO> dtos = modelListToDtoList(models);
-        return new PageImpl<>(dtos, entityPage.getPageable(), entityPage.getTotalElements());
-    }
-
-    // Método para mapear un Page de entidades a un Page de modelos
-    default Page<Conciliacion> entityPageToModelPage(Page<ConciliacionEntity> entityPage) {
-        List<Conciliacion> models = entityListToModelList(entityPage.getContent());
-        return new PageImpl<>(models, entityPage.getPageable(), entityPage.getTotalElements());
-    }
+    /**
+     * Convierte una lista de entidades a una lista de modelos de dominio
+     * @param entities Lista de entidades Conciliacion
+     * @return Lista de modelos de dominio Conciliacion
+     */
+    List<Conciliacion> toConciliacionList(List<ConciliacionEntity> entities);
 }

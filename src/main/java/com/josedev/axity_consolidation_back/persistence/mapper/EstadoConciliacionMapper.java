@@ -15,45 +15,31 @@ import java.util.List;
 public interface EstadoConciliacionMapper {
 
     /**
-     * Convierte una entidad de estado de conciliación a un modelo de dominio
-     * @param estadoConciliacionEntity La entidad de estado de conciliación proveniente de la base de datos
-     * @return El modelo de dominio estado de conciliación
+     * Convierte una entidad de EstadoConciliacion a un modelo de dominio
+     * @param entity La entidad de EstadoConciliacion proveniente de la base de datos
+     * @return El modelo de dominio EstadoConciliacion
      */
     @Mapping(target = "codigoEstado", source = "codigoEstado")
     @Mapping(target = "descripcion", source = "descripcion")
-    EstadoConciliacion toEstadoConciliacion(EstadoConciliacionEntity estadoConciliacionEntity);
-
-    /**
-     * Convierte un modelo de dominio estado de conciliación a una entidad de estado de conciliación
-     * @param estadoConciliacion El modelo de dominio estado de conciliación
-     * @return La entidad de estado de conciliación para persistir en base de datos
-     */
-    @Mapping(target = "codigoEstado", source = "codigoEstado")
-    @Mapping(target = "descripcion", source = "descripcion")
+    // Ignoramos la lista de conciliaciones ya que es una relación bidireccional
     @Mapping(target = "conciliaciones", ignore = true)
-    EstadoConciliacionEntity toEstadoConciliacionEntity(EstadoConciliacion estadoConciliacion);
+    EstadoConciliacion toEstadoConciliacion(EstadoConciliacionEntity entity);
 
     /**
-     * Convierte una lista de entidades estado de conciliación a una lista de modelos de dominio
-     * @param estadoConciliacionEntities Lista de entidades estado de conciliación
-     * @return Lista de modelos de dominio estado de conciliación
+     * Convierte un modelo de dominio EstadoConciliacion a una entidad de EstadoConciliacion
+     * @param model El modelo de dominio EstadoConciliacion
+     * @return La entidad de EstadoConciliacion para persistir en base de datos
      */
-    List<EstadoConciliacion> toEstadoConciliacionList(List<EstadoConciliacionEntity> estadoConciliacionEntities);
+    @Mapping(target = "codigoEstado", source = "codigoEstado")
+    @Mapping(target = "descripcion", source = "descripcion")
+    // Ignoramos la lista de conciliaciones para evitar ciclos
+    @Mapping(target = "conciliaciones", ignore = true)
+    EstadoConciliacionEntity toEstadoConciliacionEntity(EstadoConciliacion model);
+
+    /**
+     * Convierte una lista de entidades a una lista de modelos de dominio
+     * @param entities Lista de entidades EstadoConciliacion
+     * @return Lista de modelos de dominio EstadoConciliacion
+     */
+    List<EstadoConciliacion> toEstadoConciliacionList(List<EstadoConciliacionEntity> entities);
 }
-
-    /*
-    EstadoConciliacionMapper INSTANCE = Mappers.getMapper(EstadoConciliacionMapper.class);
-
-    EstadoConciliacion entityToModel(EstadoConciliacionEntity entity);
-
-    EstadoConciliacionEntity modelToEntity(EstadoConciliacion model);
-
-    EstadoConciliacionDTO modelToDto(EstadoConciliacion model);
-
-    EstadoConciliacion dtoToModel(EstadoConciliacionDTO dto);
-
-    List<EstadoConciliacion> entityListToModelList(List<EstadoConciliacionEntity> entities);
-
-    List<EstadoConciliacionDTO> modelListToDtoList(List<EstadoConciliacion> models);
-
-     */

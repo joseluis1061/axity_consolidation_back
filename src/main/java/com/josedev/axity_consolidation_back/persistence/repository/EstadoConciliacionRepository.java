@@ -4,6 +4,8 @@ import com.josedev.axity_consolidation_back.persistence.entity.EstadoConciliacio
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Interfaz que define el repositorio para la entidad EstadoConciliacionEntity.
  * Extiende de JpaRepository para heredar métodos CRUD básicos.
@@ -12,12 +14,22 @@ import org.springframework.stereotype.Repository;
 public interface EstadoConciliacionRepository extends JpaRepository<EstadoConciliacionEntity, String> {
 
     /**
-     * El repositorio utiliza String como tipo para la clave primaria (codigoEstado)
-     * No se requieren métodos adicionales ya que JpaRepository proporciona:
-     * - findAll(): Obtener todos los estados de conciliación
-     * - findById(String id): Buscar un estado de conciliación por su código
-     * - save(EstadoConciliacionEntity estadoConciliacion): Guardar o actualizar un estado de conciliación
-     * - deleteById(String id): Eliminar un estado de conciliación por su código
-     * - existsById(String id): Verificar si existe un estado de conciliación por su código
+     * Método para encontrar un estado de conciliación por su descripción
+     * @param descripcion La descripción del estado
+     * @return El estado de conciliación encontrado, o un Optional vacío si no existe
      */
+    Optional<EstadoConciliacionEntity> findByDescripcion(String descripcion);
+
+    /**
+     * Método para verificar si existe un estado con la descripción especificada
+     * @param descripcion La descripción del estado
+     * @return true si existe el estado, false en caso contrario
+     */
+    boolean existsByDescripcion(String descripcion);
+
+    /**
+     * Método para encontrar el estado de conciliación "Descuadrada"
+     * @return El estado de conciliación "Descuadrada", o un Optional vacío si no existe
+     */
+    Optional<EstadoConciliacionEntity> findByCodigoEstado(String codigoEstado);
 }

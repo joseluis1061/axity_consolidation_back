@@ -10,29 +10,28 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Conciliacion {
+
     private Long idConciliacion;
     private LocalDate fechaConciliacion;
+
+    // Relación con SucursalProducto
     private SucursalProducto sucursalProducto;
+
+    // También podemos incluir los códigos directamente para facilitar algunas operaciones
+    private String codigoSucursal;
+    private String codigoProducto;
+    private String codigoDocumento;
+
     private BigDecimal diferenciaFisica;
     private BigDecimal diferenciaValor;
+
+    // Relación con EstadoConciliacion
     private EstadoConciliacion estadoConciliacion;
-    private LocalDateTime fechaCreacion;
-
-    // Campos derivados para simplificar el acceso a la información
-    private String codigoSucursal;
-    private String nombreSucursal;
-    private String codigoProducto;
-    private String nombreProducto;
-    private String codigoDocumento;
     private String codigoEstado;
-    private String descripcionEstado;
 
-    // Referencias simplificadas
-    private Sucursal sucursal;
-    private Producto producto;
-    private Documento documento;
+    private LocalDateTime fechaCreacion;
 }
