@@ -22,22 +22,16 @@ public class EstadoConciliacionDTO {
      * Código único del estado de conciliación.
      * No puede estar vacío y debe tener un formato válido.
      */
-    @NotBlank(message = "El código del estado de conciliación es obligatorio")
-    @Size(min = 1, max = 2, message = "El código del estado de conciliación debe tener entre 1 y 2 caracteres")
-    @Pattern(regexp = "^[A-Z]$|^[A-Z][0-9]$", message = "El código del estado debe ser una letra mayúscula, opcionalmente seguida de un número")
+    @NotBlank(message = "El código de estado es obligatorio")
+    @Size(min = 1, max = 2, message = "El código de estado debe tener entre 1 y 2 caracteres")
+    @Pattern(regexp = "^[A-D]$", message = "El código de estado debe ser uno de los siguientes valores: A, B, C, D")
     private String codigoEstado;
 
     /**
      * Descripción del estado de conciliación.
      * No puede estar vacía.
      */
-    @NotBlank(message = "La descripción del estado de conciliación es obligatorio")
-    @Size(max = 50, message = "La descripción del estado de conciliación no puede exceder los 50 caracteres")
+    @NotBlank(message = "La descripción del estado es obligatoria")
+    @Size(max = 50, message = "La descripción del estado no puede exceder los 50 caracteres")
     private String descripcion;
 }
-
-    /*
-    private String codigoEstado;
-    private String descripcion;
-
-     */
